@@ -44,10 +44,21 @@ export default function Intro() {
   const [inputValue, setInputValue] = useState("");
   const [downloading, setDownloading] = useState(false);
 
+  function isValidURL(url: string) {
+    const pattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/;
+    return pattern.test(url);
+  }
+
   const downloadVideo = async () => {
     setDownloading(true);
     if (inputValue.length === 0) {
       toast.error("Provide a url");
+      setDownloading(false);
+      return;
+    }
+
+    if (!isValidURL(inputValue)) {
+      toast.error("Invalid URL");
       setDownloading(false);
       return;
     }
