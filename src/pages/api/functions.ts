@@ -107,6 +107,7 @@ const getVideoWM = async (url: any) => {
   const body = await request.text();
   try {
     var res = JSON.parse(body);
+    // console.log(res);
   } catch (err) {
     console.error("Error:", err);
     console.error("Response body:", body);
@@ -133,10 +134,15 @@ const getVideoNoWM = async (url: any) => {
     console.error("Error:", err);
     console.error("Response body:", body);
   }
+
+  console.log(res.aweme_list[0].desc);
+  console.log(res.aweme_list[0].author.nickname);
   const urlMedia = res.aweme_list[0].video.play_addr.url_list[0];
   const data = {
     url: urlMedia,
     id: idVideo,
+    desc: res.aweme_list[0].desc,
+    author: res.aweme_list[0].author.nickname,
   };
   return data;
 };

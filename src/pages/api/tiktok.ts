@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { main } from "./index";
+import { main } from "./functions";
 import fs from "fs";
 import path from "path";
 
@@ -11,6 +11,8 @@ type Data =
         | {
             url: string;
             id: string;
+            desc: string;
+            author: string;
           }
         | undefined;
     }
