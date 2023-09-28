@@ -1,4 +1,11 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import {
+  Dispatch,
+  MutableRefObject,
+  RefObject,
+  SetStateAction,
+  useRef,
+  useState,
+} from "react";
 import styles from "./intro.module.scss";
 import Image from "next/image";
 import toast from "react-hot-toast";
@@ -21,12 +28,19 @@ function Paste() {
 
 function Clear({
   setInputValue,
+  inputRef,
 }: {
   setInputValue: Dispatch<SetStateAction<string>>;
+  inputRef: RefObject<HTMLInputElement>;
 }) {
   return (
     <div
-      onClick={() => setInputValue("")}
+      onClick={() => {
+        setInputValue("");
+        if (inputRef.current) {
+          inputRef.current.value = "";
+        }
+      }}
       className={`${styles.clear_button} cursor-pointer rounded-lg m-1.5 p-1 pr-4 flex gap-1 items-center`}
     >
       <Image
@@ -43,6 +57,8 @@ function Clear({
 export default function Intro() {
   const [inputValue, setInputValue] = useState("");
   const [downloading, setDownloading] = useState(false);
+
+  const inputRef = useRef(null);
 
   function isValidURL(url: string) {
     const pattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/;
@@ -150,11 +166,12 @@ export default function Intro() {
             onChange={(e) => setInputValue(e.target.value)}
             className="rounded w-full p-3 outline-none text-black placeholder:text-slate-400"
             type="text"
-            value={inputValue}
+            ref={inputRef}
+            // value={inputValue}
             placeholder="Paste TikTok link here"
           />
           {inputValue.length > 0 ? (
-            <Clear setInputValue={setInputValue} />
+            <Clear setInputValue={setInputValue} inputRef={inputRef} />
           ) : (
             <Paste />
           )}
