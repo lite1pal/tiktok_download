@@ -73,11 +73,11 @@ export default function Intro() {
       return;
     }
 
-    if (!isValidURL(inputValue)) {
-      toast.error("Invalid URL");
-      setDownloading(false);
-      return;
-    }
+    // if (!isValidURL(inputValue)) {
+    //   toast.error("Invalid URL");
+    //   setDownloading(false);
+    //   return;
+    // }
 
     const url = new URL(inputValue);
     if (
