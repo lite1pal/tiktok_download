@@ -3,6 +3,7 @@ import {
   MutableRefObject,
   RefObject,
   SetStateAction,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -58,44 +59,48 @@ export default function Intro() {
   const [inputValue, setInputValue] = useState("");
   const [downloading, setDownloading] = useState(false);
 
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   function isValidURL(url: string) {
-    const pattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/;
+    const pattern = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
     return pattern.test(url);
   }
+
+  useEffect(() => {
+    if (inputValue === "" && inputRef.current) {
+      inputRef.current.value = "";
+    }
+  }, [inputValue]);
 
   const downloadVideo = async () => {
     setDownloading(true);
     if (inputValue.length === 0) {
       toast.error("Provide a url");
       setDownloading(false);
+      setInputValue("");
       return;
     }
 
-    // if (!isValidURL(inputValue)) {
-    //   toast.error("Invalid URL");
-    //   setDownloading(false);
-    //   return;
-    // }
+    if (!isValidURL(inputValue)) {
+      toast.error("Invalid URL");
+      setDownloading(false);
+      setInputValue("");
+      return;
+    }
 
     const url = new URL(inputValue);
-    if (
-      url.hostname !== "www.tiktok.com" &&
-      url.hostname !== "vt.tiktok.com" &&
-      url.hostname !== "vm.tiktok.com"
-    ) {
-      toast.error("URL must be from Tiktok");
-      setDownloading(false);
-      return;
-    }
-    // if (
-    //   !["www.tiktok.com", "vt.tiktok.com", "vm.tiktok.com"].includes(inputValue)
-    // ) {
-    //   toast.error("URL must be from Tiktok");
-    //   setDownloading(false);
-    //   return;
-    // }
+    console.log(url);
+    if (url)
+      if (
+        url.hostname !== "www.tiktok.com" &&
+        url.hostname !== "vt.tiktok.com" &&
+        url.hostname !== "vm.tiktok.com"
+      ) {
+        toast.error("URL must be from Tiktok");
+        setDownloading(false);
+        setInputValue("");
+        return;
+      }
 
     const response = await fetch("/api/hello", {
       method: "POST",
@@ -141,6 +146,9 @@ export default function Intro() {
       window.URL.revokeObjectURL(url);
       setDownloading(false);
       setInputValue("");
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
       toast.success("Video is downloaded successfully!", { duration: 5 });
     } else {
       console.error(`Failed to download video ${data.data.id}`);
