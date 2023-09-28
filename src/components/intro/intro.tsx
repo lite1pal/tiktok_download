@@ -52,15 +52,23 @@ export default function Intro() {
       return;
     }
 
+    const url = new URL(inputValue);
     if (
-      !inputValue.includes("www.tiktok.com") ||
-      !inputValue.includes("vm.tiktok.com") ||
-      !inputValue.includes("vt.tiktok.com")
+      url.hostname !== "www.tiktok.com" &&
+      url.hostname !== "vt.tiktok.com" &&
+      url.hostname !== "vm.tiktok.com"
     ) {
       toast.error("URL must be from Tiktok");
       setDownloading(false);
       return;
     }
+    // if (
+    //   !["www.tiktok.com", "vt.tiktok.com", "vm.tiktok.com"].includes(inputValue)
+    // ) {
+    //   toast.error("URL must be from Tiktok");
+    //   setDownloading(false);
+    //   return;
+    // }
 
     const response = await fetch("/api/hello", {
       method: "POST",
