@@ -1,0 +1,16 @@
+@import "./../../styles/media.scss";
+
+.main {
+  padding: 0 1rem;
+  padding-top: 4rem;
+
+  @include mq-tablet-landscape--up {
+    padding: 0 4%;
+    padding-top: 4rem;
+  }
+
+  @include mq-desktop--up {
+    padding: 0 9%;
+    padding-top: 4rem;
+  }
+}

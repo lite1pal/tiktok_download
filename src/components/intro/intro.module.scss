@@ -1,0 +1,29 @@
+@import "../../styles/media.scss";
+
+.main {
+}
+
+.paste_button {
+  background-color: #dae4ff;
+}
+
+.clear_button {
+  background-color: gray;
+}
+
+.input_button {
+  width: 100%;
+
+  @include mq-tablet-landscape--up {
+    width: 47rem;
+  }
+}
+
+.download_button {
+  background-color: #00be63;
+  transition: 0.2s ease-in-out;
+
+  &:hover {
+    background-color: #00be45;
+  }
+}

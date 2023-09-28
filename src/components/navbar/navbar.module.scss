@@ -1,0 +1,13 @@
+@import "../../styles/media.scss";
+
+.main {
+  background-color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 0.5rem;
+
+  @include mq-tablet-landscape--up {
+    padding: 0.7rem 8rem;
+  }
+}
