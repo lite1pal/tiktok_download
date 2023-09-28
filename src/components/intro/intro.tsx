@@ -52,7 +52,11 @@ export default function Intro() {
       return;
     }
 
-    if (!inputValue.includes("www.tiktok.com")) {
+    if (
+      !inputValue.includes("www.tiktok.com") ||
+      !inputValue.includes("vm.tiktok.com") ||
+      !inputValue.includes("vt.tiktok.com")
+    ) {
       toast.error("URL must be from Tiktok");
       setDownloading(false);
       return;
