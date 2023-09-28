@@ -324,7 +324,7 @@ export default function Intro() {
                 onClick={() => {
                   downloadVideoFromBrowser();
                 }}
-                className="px-12 py-3 bg-green-500 hover:bg-green-600 cursor-pointer rounded"
+                className="px-24 py-3 bg-green-500 hover:bg-green-600 cursor-pointer rounded"
               >
                 Download Server 02
               </div>
@@ -353,7 +353,7 @@ export default function Intro() {
                 controls
                 autoPlay
                 muted
-                className="opacity-0 absolute top-0 pointer-events-none"
+                className="opacity-0 w-2 h-2 absolute top-0 pointer-events-none"
               />
             </div>
           </div>
