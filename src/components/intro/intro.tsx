@@ -331,6 +331,7 @@ export default function Intro() {
               <div
                 onClick={() => {
                   setVideoBlob(undefined);
+                  setAudioBlob(undefined);
                   setVideoInfo({
                     data: {
                       url: "",
