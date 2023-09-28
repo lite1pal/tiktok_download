@@ -10,6 +10,7 @@ type Data =
         | string
         | {
             url: string;
+            url_mp3: string;
             id: string;
             desc: string;
             author: string;

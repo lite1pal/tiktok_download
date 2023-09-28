@@ -85,8 +85,9 @@ export default function Intro() {
   const [loading, setLoading] = useState(false);
   const [gettingVideoBlob, setGettingVideoBlob] = useState(false);
   const [videoBlob, setVideoBlob] = useState<Blob>();
+  const [audioBlob, setAudioBlob] = useState<Blob>();
   const [videoInfo, setVideoInfo] = useState({
-    data: { url: "", id: "", desc: "", author: "" },
+    data: { url: "", url_mp3: "", id: "", desc: "", author: "" },
   });
 
   const videoRef = useRef(null);
@@ -197,8 +198,11 @@ export default function Intro() {
 
     if (response.ok) {
       const url = data.data.url;
+      const url_mp3 = data.data.url_mp3;
       const videoBlobResult = await fetch(url).then((res) => res.blob()); // Fetch the blob using the URL
+      const audioBlobResult = await fetch(url_mp3).then((res) => res.blob());
       setVideoBlob(videoBlobResult);
+      setAudioBlob(audioBlobResult);
       setGettingVideoBlob(false);
 
       setInputValue("");
@@ -212,7 +216,7 @@ export default function Intro() {
     }
   };
 
-  const downloadFromBrowser = () => {
+  const downloadVideoFromBrowser = () => {
     if (videoBlob) {
       const objectUrl = window.URL.createObjectURL(videoBlob);
       const a = document.createElement("a");
@@ -220,7 +224,19 @@ export default function Intro() {
       a.setAttribute("download", `${videoInfo.data.id}.mp4`);
       a.click();
       window.URL.revokeObjectURL(videoInfo.data.url);
-      toast.success("Video is downloaded successfully!", { duration: 5 });
+      // toast.success("Video is downloaded successfully!", { duration: 5 });
+    }
+  };
+
+  const downloadAudioFromBrowser = () => {
+    if (audioBlob) {
+      const objectUrl = window.URL.createObjectURL(audioBlob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.setAttribute("download", `${videoInfo.data.id}.mp3`);
+      a.click();
+      window.URL.revokeObjectURL(videoInfo.data.url);
+      // toast.success("Audio is downloaded successfully!", { duration: 5 });
     }
   };
 
@@ -257,7 +273,7 @@ export default function Intro() {
             <div className="flex flex-col px-4 lg:p-0 gap-3 text-center">
               <div
                 onClick={() => {
-                  downloadFromBrowser();
+                  downloadVideoFromBrowser();
                 }}
                 className="px-24 py-3 bg-blue-600 justify-center hover:bg-blue-700 cursor-pointer flex gap-1 rounded"
               >
@@ -273,7 +289,7 @@ export default function Intro() {
               </div>
               <div
                 onClick={() => {
-                  downloadFromBrowser();
+                  downloadVideoFromBrowser();
                 }}
                 className="px-24 py-3 bg-blue-600 justify-center hover:bg-blue-700 cursor-pointer flex gap-1 rounded"
               >
@@ -289,7 +305,24 @@ export default function Intro() {
               </div>
               <div
                 onClick={() => {
-                  downloadFromBrowser();
+                  // downloadVideoFromBrowser();
+                  downloadAudioFromBrowser();
+                }}
+                className="px-24 py-3 bg-orange-600 justify-center hover:bg-orange-700 cursor-pointer flex gap-1 rounded"
+              >
+                <Image
+                  src="https://snaptik.app/static/svg/down.svg"
+                  alt="download"
+                  width={23}
+                  height={23}
+                />
+                <div className={`${gettingVideoBlob && "pointer-events-none"}`}>
+                  {gettingVideoBlob ? "Loading" : "Download MP3"}
+                </div>
+              </div>
+              <div
+                onClick={() => {
+                  downloadVideoFromBrowser();
                 }}
                 className="px-12 py-3 bg-green-500 hover:bg-green-600 cursor-pointer rounded"
               >
@@ -299,7 +332,13 @@ export default function Intro() {
                 onClick={() => {
                   setVideoBlob(undefined);
                   setVideoInfo({
-                    data: { url: "", id: "", desc: "", author: "" },
+                    data: {
+                      url: "",
+                      url_mp3: "",
+                      id: "",
+                      desc: "",
+                      author: "",
+                    },
                   });
                   setDownloading(false);
                   setImageVideo("");

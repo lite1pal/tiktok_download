@@ -140,10 +140,12 @@ const getVideoNoWM = async (url: any) => {
   const urlMedia = res.aweme_list[0].video.play_addr.url_list[0];
   const data = {
     url: urlMedia,
+    url_mp3: res.aweme_list[0].added_sound_music_info.play_url.uri,
     id: idVideo,
     desc: res.aweme_list[0].desc,
     author: res.aweme_list[0].author.nickname,
   };
+  console.log(res.aweme_list[0]);
   return data;
 };
 
