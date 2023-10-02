@@ -1,6 +1,5 @@
 import {
   Dispatch,
-  MutableRefObject,
   RefObject,
   SetStateAction,
   useEffect,
@@ -10,6 +9,9 @@ import {
 import styles from "./intro.module.scss";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import { en } from "../../../languages/en";
+import { de } from "../../../languages/de";
+import { getCookie } from "cookies-next";
 
 function LoadingSpinner() {
   return (
@@ -35,7 +37,7 @@ function LoadingSpinner() {
   );
 }
 
-function Paste() {
+function Paste({ language }: { language: any }) {
   return (
     <div
       className={`${styles.paste_button} cursor-pointer rounded-lg m-1.5 p-1 pr-4 flex gap-1 items-center`}
@@ -46,15 +48,19 @@ function Paste() {
         width={20}
         height={20}
       />
-      <div className="text-sm text-blue-700">Paste</div>
+      <div className="text-sm text-blue-700">
+        {language.intro_section.paste_button}
+      </div>
     </div>
   );
 }
 
 function Clear({
+  language,
   setInputValue,
   inputRef,
 }: {
+  language: any;
   setInputValue: Dispatch<SetStateAction<string>>;
   inputRef: RefObject<HTMLInputElement>;
 }) {
@@ -74,34 +80,40 @@ function Clear({
         width={20}
         height={20}
       />
-      <div className="text-sm text-white">Clear</div>
+      <div className="text-sm text-white">
+        {language.intro_section.clear_button}
+      </div>
     </div>
   );
 }
 
-export default function Intro() {
+export default function Intro({ language }: { language: any }) {
+  // state
   const [inputValue, setInputValue] = useState("");
   const [downloading, setDownloading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [gettingVideoBlob, setGettingVideoBlob] = useState(false);
   const [videoBlob, setVideoBlob] = useState<Blob>();
+  const [deterioratedVideoBlob, setDeterioratedVideoBlob] = useState<Blob>();
   const [audioBlob, setAudioBlob] = useState<Blob>();
   const [videoInfo, setVideoInfo] = useState({
     data: { url: "", url_mp3: "", id: "", desc: "", author: "" },
   });
-
-  const videoRef = useRef(null);
   const [imageVideo, setImageVideo] = useState("");
-
   const [testBlob, setTestBlob] = useState<Blob | null>(null);
 
+  // ref
+  const videoRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // FUNCTIONS
+  // captures an image from the video
   const captureImage = () => {
     const canvas = document.createElement("canvas");
     if (videoRef.current) {
       const videoElement = videoRef.current as HTMLVideoElement;
       canvas.width = videoElement.videoWidth;
       canvas.height = videoElement.videoHeight;
-      console.log(videoRef);
     }
 
     // Draw the current frame of the video on the canvas
@@ -117,16 +129,17 @@ export default function Intro() {
   };
 
   // ALPHA
-  useEffect(() => {
-    const test = async () => {
-      const testBlob = await fetch(
-        "https://v16m-default.akamaized.net/45f33075b492e37963d62bfa360aaf05/6515e0d3/video/tos/useast2a/tos-useast2a-ve-0068c004/osqgVuz5fBmZWi0dkIjcAAPC8NuIUkQNoykwFh/?a=0&ch=0&cr=0&dr=0&lr=all&cd=0%7C0%7C0%7C0&cv=1&br=4252&bt=2126&bti=OHYpOTY0Zik7OzlmOm01MzE6ZC4xMDo%3D&cs=0&ds=6&ft=ArCXsBnPq8ZmowMv5Q_vjhtj_ReLrus&mime_type=video_mp4&qs=0&rc=NWllaGlkODZpOTU2ODo8OkBpMzlyZmc6ZmY7bDMzNzczM0AvNTVeYl5hNjMxLzZiLTUzYSNiczJycjRnaW5gLS1kMTZzcw%3D%3D&l=20230928142338965AD36A952E68B404CF&btag=e00088000"
-      ).then((res) => res.blob());
-      setTestBlob(testBlob);
-    };
-    test();
-  }, []);
+  // useEffect(() => {
+  //   const test = async () => {
+  //     const testBlob = await fetch(
+  //       "https://v16m-default.akamaized.net/45f33075b492e37963d62bfa360aaf05/6515e0d3/video/tos/useast2a/tos-useast2a-ve-0068c004/osqgVuz5fBmZWi0dkIjcAAPC8NuIUkQNoykwFh/?a=0&ch=0&cr=0&dr=0&lr=all&cd=0%7C0%7C0%7C0&cv=1&br=4252&bt=2126&bti=OHYpOTY0Zik7OzlmOm01MzE6ZC4xMDo%3D&cs=0&ds=6&ft=ArCXsBnPq8ZmowMv5Q_vjhtj_ReLrus&mime_type=video_mp4&qs=0&rc=NWllaGlkODZpOTU2ODo8OkBpMzlyZmc6ZmY7bDMzNzczM0AvNTVeYl5hNjMxLzZiLTUzYSNiczJycjRnaW5gLS1kMTZzcw%3D%3D&l=20230928142338965AD36A952E68B404CF&btag=e00088000"
+  //     ).then((res) => res.blob());
+  //     setTestBlob(testBlob);
+  //   };
+  //   test();
+  // }, []);
 
+  // keeps videoBlob updated to show an image
   useEffect(() => {
     if (videoRef.current && videoBlob) {
       // Assert the type of videoRef.current as HTMLVideoElement
@@ -141,19 +154,20 @@ export default function Intro() {
     }
   }, [videoBlob]);
 
-  const inputRef = useRef<HTMLInputElement>(null);
-
+  // validates an input value to be URL
   function isValidURL(url: string) {
     const pattern = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
     return pattern.test(url);
   }
 
+  // clears input element's value
   useEffect(() => {
     if (inputValue === "" && inputRef.current) {
       inputRef.current.value = "";
     }
   }, [inputValue]);
 
+  // retrieves a video blob from the provided URL
   const getVideoBlob = async () => {
     if (inputValue.length === 0) {
       toast.error("Provide a url");
@@ -216,6 +230,28 @@ export default function Intro() {
     }
   };
 
+  // takes a video blob, deteriorates its quality and returns it
+  const deteriorateVideoBlob = async (videoBlob: Blob) => {
+    try {
+      if (!videoInfo.data.url) {
+        return console.error("video_url is empty");
+      }
+
+      const response = await fetch("/api/deteriorate", {
+        method: "POST",
+        body: JSON.stringify({ video_url: videoInfo.data.url }), // Replace with your video URL
+      });
+
+      const parsedRes = await response.json();
+      console.log(parsedRes);
+
+      // const blob = await response.blob();
+    } catch (err: any) {
+      console.error(err.message);
+    }
+  };
+
+  // downloads a video blob from the browser
   const downloadVideoFromBrowser = () => {
     if (videoBlob) {
       const objectUrl = window.URL.createObjectURL(videoBlob);
@@ -228,6 +264,19 @@ export default function Intro() {
     }
   };
 
+  const downloadDeterioratedVideoFromBrowser = () => {
+    if (deterioratedVideoBlob) {
+      const objectUrl = window.URL.createObjectURL(deterioratedVideoBlob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.setAttribute("download", `${videoInfo.data.id}.mp4`);
+      a.click();
+      window.URL.revokeObjectURL(videoInfo.data.url);
+      // toast.success("Video is downloaded successfully!", { duration: 5 });
+    }
+  };
+
+  // downloads a audio version of the video from the browser
   const downloadAudioFromBrowser = () => {
     if (audioBlob) {
       const objectUrl = window.URL.createObjectURL(audioBlob);
@@ -284,7 +333,9 @@ export default function Intro() {
                   height={23}
                 />
                 <div className={`${gettingVideoBlob && "pointer-events-none"}`}>
-                  {gettingVideoBlob ? "Loading" : "Download HD"}
+                  {gettingVideoBlob
+                    ? "Loading"
+                    : `${language.intro_section.download_button} HD`}
                 </div>
               </div>
               <div
@@ -300,7 +351,9 @@ export default function Intro() {
                   height={23}
                 />
                 <div className={`${gettingVideoBlob && "pointer-events-none"}`}>
-                  {gettingVideoBlob ? "Loading" : "Download"}
+                  {gettingVideoBlob
+                    ? "Loading"
+                    : language.intro_section.download_button}
                 </div>
               </div>
               <div
@@ -317,7 +370,9 @@ export default function Intro() {
                   height={23}
                 />
                 <div className={`${gettingVideoBlob && "pointer-events-none"}`}>
-                  {gettingVideoBlob ? "Loading" : "Download MP3"}
+                  {gettingVideoBlob
+                    ? "Loading"
+                    : `${language.intro_section.download_button} MP3`}
                 </div>
               </div>
               <div
@@ -326,7 +381,7 @@ export default function Intro() {
                 }}
                 className="px-24 py-3 bg-green-500 hover:bg-green-600 cursor-pointer rounded"
               >
-                Download Server 02
+                {language.intro_section.download_button} Server 02
               </div>
               <div
                 onClick={() => {
@@ -346,7 +401,7 @@ export default function Intro() {
                 }}
                 className="px-12 py-3 bg-black cursor-pointer rounded"
               >
-                Download other video
+                {language.intro_section.download_button} other video
               </div>
               <video
                 ref={videoRef}
@@ -364,9 +419,11 @@ export default function Intro() {
           className="w-full pt-14 pb-16 px-4 lg:pt-24 items-center flex flex-col gap-6"
         >
           <div className="text-2xl font-medium lg:text-5xl">
-            TikTok Video Download
+            {language.intro_section.header}
           </div>
-          <div className="lg:text-xl">Without Watermark. Fast. All devices</div>
+          <div className="lg:text-xl">
+            {language.intro_section.small_header}
+          </div>
           <div
             className={`${styles.input_button} flex flex-col lg:flex-row gap-2 items-center justify-center m-auto`}
           >
@@ -376,18 +433,21 @@ export default function Intro() {
                 className="rounded w-full p-3 outline-none text-black placeholder:text-slate-400"
                 type="text"
                 ref={inputRef}
-                placeholder="Paste TikTok link here"
+                placeholder={language.intro_section.input_placeholder}
               />
               {inputValue.length > 0 ? (
-                <Clear setInputValue={setInputValue} inputRef={inputRef} />
+                <Clear
+                  language={language}
+                  setInputValue={setInputValue}
+                  inputRef={inputRef}
+                />
               ) : (
-                <Paste />
+                <Paste language={language} />
               )}
             </div>
             <div
               onClick={() => {
                 getVideoBlob();
-                // captureImage();
               }}
               className={`${styles.download_button} text-lg cursor-pointer  flex items-center justify-center gap-2 font-medium lg:w-fit w-full rounded px-5 py-2.5`}
             >
@@ -397,7 +457,11 @@ export default function Intro() {
                 width={23}
                 height={23}
               />
-              <div>{downloading ? "Loading..." : "Download"}</div>
+              <div>
+                {downloading
+                  ? "Loading..."
+                  : language.intro_section.download_button}
+              </div>
             </div>
           </div>
         </div>

@@ -135,8 +135,8 @@ const getVideoNoWM = async (url: any) => {
     console.error("Response body:", body);
   }
 
-  console.log(res.aweme_list[0].desc);
-  console.log(res.aweme_list[0].author.nickname);
+  console.log(res.aweme_list[0]);
+
   const urlMedia = res.aweme_list[0].video.play_addr.url_list[0];
   const data = {
     url: urlMedia,
@@ -145,7 +145,6 @@ const getVideoNoWM = async (url: any) => {
     desc: res.aweme_list[0].desc,
     author: res.aweme_list[0].author.nickname,
   };
-  console.log(res.aweme_list[0]);
   return data;
 };
 

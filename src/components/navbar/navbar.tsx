@@ -1,7 +1,16 @@
 import Image from "next/image";
 import styles from "./navbar.module.scss";
 import { Button, Menu } from "@mui/material";
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
+import { setCookie } from "cookies-next";
+import { en } from "../../../languages/en";
+import { de } from "../../../languages/de";
+import { vi } from "../../../languages/vi";
+import { it } from "../../../languages/it";
+import { es } from "../../../languages/es";
+import { ja } from "../../../languages/ja";
+import { ru } from "../../../languages/ru";
+import { fr } from "../../../languages/fr";
 
 function MenuItem({
   text,
@@ -20,14 +29,22 @@ function MenuItem({
   );
 }
 
-function BasicMenu() {
+function BasicMenu({
+  language,
+  setLanguage,
+}: {
+  language: any;
+  setLanguage: Dispatch<SetStateAction<any>>;
+}) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClose = () => {
+  const handleClose = (file: any, lang: any) => {
     setAnchorEl(null);
+    setCookie("language", lang);
+    setLanguage(file);
   };
 
   return (
@@ -66,15 +83,20 @@ function BasicMenu() {
         id="basic-menu"
         anchorEl={anchorEl}
         open={open}
-        onClose={handleClose}
+        onClose={() => setAnchorEl(null)}
         MenuListProps={{
           "aria-labelledby": "basic-button",
         }}
       >
-        <MenuItem text="English" handleClose={handleClose} />
-        <MenuItem text="German" handleClose={handleClose} />
-        <MenuItem text="Italian" handleClose={handleClose} />
-        <MenuItem text="Русский" handleClose={handleClose} />
+        <MenuItem text="English" handleClose={() => handleClose(en, "en")} />
+        <MenuItem text="German" handleClose={() => handleClose(de, "de")} />
+        <MenuItem text="Vietnamese" handleClose={() => handleClose(vi, "vi")} />
+        <MenuItem text="Italian" handleClose={() => handleClose(it, "it")} />
+        <MenuItem text="Español" handleClose={() => handleClose(es, "es")} />
+        <MenuItem text="Japanese" handleClose={() => handleClose(ja, "ja")} />
+        <MenuItem text="Russian" handleClose={() => handleClose(ru, "ru")} />
+        <MenuItem text="French" handleClose={() => handleClose(fr, "fr")} />
+        {/* <MenuItem text="Русский" handleClose={handleClose} />
         <MenuItem text="Bahasa Indonesia" handleClose={handleClose} />
         <MenuItem text="Tiếng Việt" handleClose={handleClose} />
         <MenuItem text="Bahasa Malaysia" handleClose={handleClose} />
@@ -94,7 +116,7 @@ function BasicMenu() {
         <MenuItem text="украї́нська мо́ва" handleClose={handleClose} />
         <MenuItem text="رَبِيّ" handleClose={handleClose} />
         <MenuItem text="한국어" handleClose={handleClose} />
-        <MenuItem text="日本語" handleClose={handleClose} />
+        <MenuItem text="日本語" handleClose={handleClose} /> */}
       </Menu>
     </div>
   );
@@ -121,14 +143,20 @@ function IconOptions() {
   );
 }
 
-export default function Navbar() {
+export default function Navbar({
+  language,
+  setLanguage,
+}: {
+  language: any;
+  setLanguage: Dispatch<SetStateAction<any>>;
+}) {
   return (
     <nav className={`${styles.main}`}>
       <div>
         <Image src="/logo.png" alt="logo" width={95} height={95} />
       </div>
       {/* <div className="font-medium text-slate-700 max-lg:hidden">Languages</div> */}
-      <BasicMenu />
+      <BasicMenu {...{ language, setLanguage }} />
     </nav>
   );
 }
